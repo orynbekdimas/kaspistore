@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4>ActiveOrders нәтижесі</h4>
+
+{% if applied %}
+  <div class="alert alert-success">
+    Резерв есептелді. Склад бетіне кіріп “Резерв / Қолжетімді” бағандарын көре аласыз.
+  </div>
+
+  <h5>Тауарлар бойынша резерв қосылды</h5>
+  <table class="table table-sm">
+    <thead><tr><th>Тауар</th><th>Резерв (дана)</th></tr></thead>
+    <tbody>
+      {% for name, qty in applied %}
+        <tr><td>{{ name }}</td><td>{{ qty }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="alert alert-warning">Резервке түсетін заказ табылмады.</div>
+{% endif %}
+
+{% if unknown %}
+  <div class="alert alert-warning">
+    Кейбір жолдар тауарға байланбады (alias жоқ). Оларды ProductAlias ретінде қосу керек.
+  </div>
+
+  <table class="table table-sm">
+    <thead><tr><th>Кілт (Артикул/Атауы)</th><th>Резерв</th></tr></thead>
+    <tbody>
+      {% for key, qty in unknown %}
+        <tr><td>{{ key }}</td><td>{{ qty }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if unknown_rows %}
+  <details class="mt-3">
+    <summary>Техникалық ескертпелер (қате жолдар)</summary>
+    <pre class="mt-2">{{ unknown_rows|join('\n') }}</pre>
+  </details>
+{% endif %}
+
+<a class="btn btn-secondary mt-3" href="{{ url_for('products') }}">Складқа қайту</a>
+
+{% endblock %}

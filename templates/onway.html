@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Жолдағы тауарлар</h3>
+<p class="text-muted">Бұл жерде қолмен қосылған жолдағы тауарлар тұрады.</p>
+
+<div class="mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+  <div>
+    <b>Жолда барлығы:</b> {{ total_onway_qty }} дана
+    <a class="btn btn-sm btn-primary ms-3" href="{{ url_for('onway_add') }}">Қосу (+1)</a>
+  </div>
+
+  <div class="text-end">
+    <div><b>Жолда жалпы сомасы:</b> {{ total_onway_sum }} тг</div>
+    <div><b>Жолда жалпы пайда:</b> {{ total_onway_profit }} тг</div>
+  </div>
+</div>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Тауар</th>
+      <th class="text-end">Жолда (дана)</th>
+      <th class="text-end">Таза пайда (тг)</th>
+      <th class="text-end">Жолда сомасы (тг)</th>
+      <th class="text-end">Әрекет</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+      <tr>
+        <td>
+          <a href="{{ url_for('onway_product_detail', product_id=p.id) }}">{{ p.name }}</a>
+        </td>
+        <td class="text-end">{{ p.onway_qty or 0 }}</td>
+        <td class="text-end">{{ profit_by_pid.get(p.id, 0) }}</td>
+        <td class="text-end">{{ sums_by_pid.get(p.id, 0) }}</td>
+        <td class="text-end">
+          {% if (p.onway_qty or 0) > 0 %}
+          <form method="post" action="{{ url_for('onway_remove', product_id=p.id) }}" style="display:inline;">
+            <button class="btn btn-sm btn-outline-danger" type="submit">-1</button>
+          </form>
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

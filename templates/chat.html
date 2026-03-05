@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="mb-0">AI Чат-бот</h3>
+    <div class="muted" style="font-weight:600;">Сұрақ қойыңыз: склад, импорт, жолда, отчет туралы — бәріне көмектеседі.</div>
+  </div>
+  <div class="pill"><span class="muted">API:</span> <span>/api/chat</span></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12">
+    <div id="chatBox" class="p-3" style="border:1px solid var(--line); border-radius: var(--radius); background:#fff; height: 420px; overflow:auto;">
+      <div class="muted" style="font-weight:600;">Жазыңыз да Enter басыңыз.</div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <form id="chatForm" class="d-flex gap-2">
+      <input id="chatInput" class="form-control" placeholder="Мысалы: 'Excel импортта қате шықты, не істеймін?'" autocomplete="off">
+      <button id="sendBtn" class="btn btn-primary" type="submit">Жіберу</button>
+    </form>
+    <div id="err" class="mt-2" style="display:none; color:#b91c1c; font-weight:700;"></div>
+  </div>
+</div>
+
+<script>
+  const chatBox = document.getElementById('chatBox');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const err = document.getElementById('err');
+
+  function addMsg(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'mb-2';
+
+    const badge = document.createElement('span');
+    badge.className = 'pill';
+    badge.style.fontSize = '12px';
+    badge.style.padding = '6px 10px';
+    badge.textContent = role === 'user' ? 'Сіз' : 'AI';
+
+    const msg = document.createElement('div');
+    msg.style.whiteSpace = 'pre-wrap';
+    msg.style.marginTop = '6px';
+    msg.style.padding = '10px 12px';
+    msg.style.borderRadius = '14px';
+    msg.style.border = '1px solid var(--line)';
+    msg.style.background = role === 'user' ? 'rgba(37,99,235,.06)' : '#fff';
+    msg.textContent = text;
+
+    wrap.appendChild(badge);
+    wrap.appendChild(msg);
+    chatBox.appendChild(wrap);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function sendMessage(text) {
+    err.style.display = 'none';
+    addMsg('user', text);
+    chatInput.value = '';
+    sendBtn.disabled = true;
+
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        throw new Error(data.error || ('HTTP ' + r.status));
+      }
+      addMsg('ai', data.reply || '(empty)');
+    } catch (e) {
+      err.textContent = 'Қате: ' + e.message;
+      err.style.display = 'block';
+    } finally {
+      sendBtn.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  chatForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const text = (chatInput.value || '').trim();
+    if (!text) return;
+    sendMessage(text);
+  });
+</script>
+
+{% endblock %}

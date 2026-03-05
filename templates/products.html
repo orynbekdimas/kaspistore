@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Склад</h3>
+
+<div class="mb-3">
+  <strong>Складтың жалпы сомасы:</strong> {{ total_value }} тг
+</div>
+
+<form method="post" class="row g-2 mb-3">
+  <div class="col-md-6">
+    <input class="form-control" name="name" placeholder="Складтағы тауар атауы" required>
+  </div>
+
+  <div class="col-md-2">
+    <input class="form-control" name="purchase_price" type="number" min="1" placeholder="Сатып алу бағасы" required>
+  </div>
+
+  <div class="col-md-2">
+    <input class="form-control" name="stock_qty" type="number" min="0" placeholder="Қолда" required>
+  </div>
+
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100">Қосу</button>
+  </div>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Тауар</th>
+      <th>Сатып алу бағасы</th>
+      <th>Жалпы</th>
+      <th>Жолда</th>
+      <th>Қолжетімді</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.purchase_price }}</td>
+        <td>{{ p.stock_qty }}</td>
+        <td>{{ p.onway_qty }}</td>
+        <td>{{ p.available_qty }}</td>
+        <td>
+          <a class="me-3" href="{{ url_for('product_detail', product_id=p.id) }}">Карточкалар</a>
+          <a href="{{ url_for('product_edit', product_id=p.id) }}">Өзгерту</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

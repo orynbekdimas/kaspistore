@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Жолда импорт нәтижесі</h3>
+
+{% if applied %}
+  <h5>Қолданылды</h5>
+  <ul>
+    {% for pid, qty in applied %}
+      <li>Product ID {{ pid }}: +{{ qty }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if unknown %}
+  <h5 class="text-danger">Табылмағандар (alias жоқ)</h5>
+  <ul>
+    {% for a, q in unknown %}
+      <li>{{ a }} — {{ q }} дана</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<a class="btn btn-outline-secondary" href="{{ url_for('onway') }}">Жолда бетіне қайту</a>
+{% endblock %}

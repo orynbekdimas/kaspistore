@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Келе жатыр</h3>
+<p class="text-muted">Бұл жерде заказ берілген, бірақ складқа келмеген тауарлар тұрады.</p>
+
+<form method="post" style="max-width:1100px;">
+  <div style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+    <div style="flex:1; min-width:320px;">
+      <label style="display:block; margin-bottom:6px;">Тауар</label>
+      <select name="product_id" class="form-select" required>
+        <option value="">Тауар таңдаңыз...</option>
+        {% for p in products %}
+          <option value="{{ p.id }}">{{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="min-width:160px;">
+      <label style="display:block; margin-bottom:6px;">Саны</label>
+      <input name="qty" type="number" min="1" class="form-control" required>
+    </div>
+
+    <div style="min-width:240px;">
+      <label style="display:block; margin-bottom:6px;">Сатып алынған бағасы (тг)</label>
+      <input name="purchase_price" type="number" min="1" class="form-control" required>
+    </div>
+
+    <div style="min-width:160px;">
+      <button class="btn btn-primary" type="submit">Қосу</button>
+    </div>
+  </div>
+</form>
+
+<hr>
+
+<div class="mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+  <div><b>Келе жатқан барлығы:</b> {{ total_incoming_qty }} дана</div>
+  <div class="text-end"><b>Келе жатқан жалпы бағасы:</b> {{ total_incoming_cost }} тг</div>
+</div>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Тауар</th>
+      <th class="text-end">Келе жатыр (дана)</th>
+      <th class="text-end">Жалпы бағасы (тг)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>
+          <a href="{{ url_for('product_detail', product_id=r.product_id) }}">{{ r.name }}</a>
+        </td>
+        <td class="text-end">{{ r.qty }}</td>
+        <td class="text-end">{{ r.cost }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

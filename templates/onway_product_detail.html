@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Жолда: {{ product.name }}</h3>
+<p class="text-muted">
+  Бұл жерде осы тауардың жолда тұрған 1-даналық позициялары және есептері көрсетіледі.
+  (Комиссия 12% + доставка шкаласы + закуп)
+</p>
+
+<div class="mb-3">
+  <div><b>Жалпы сомасы:</b> {{ total_sum }} тг</div>
+  <div><b>Жалпы таза пайда:</b> {{ total_profit }} тг</div>
+
+  <div class="text-muted" style="margin-top:10px;">
+    Барлығы: комиссия = {{ total_commission }} тг,
+    доставка = {{ total_delivery }} тг,
+    закуп (әр данасына) = {{ product.purchase_price }} тг
+  </div>
+</div>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th style="width:60px;">#</th>
+      <th style="width:220px;">Қосылған уақыты</th>
+      <th class="text-end">Таза пайда (тг)</th>
+      <th class="text-end" style="width:140px;">Баға (тг)</th>
+      <th class="text-end" style="width:110px;">Әрекет</th> <!-- ✅ Бағаның оң жағында -->
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ loop.index }}</td>
+
+        <td>{{ row.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+
+        <td class="text-end">
+          <div><b>{{ row.profit }}</b></div>
+          <div class="text-muted" style="font-size:12px;">
+            -12%: {{ row.commission }},
+            доставка: {{ row.delivery }},
+            закуп: {{ row.purchase_price }}
+          </div>
+        </td>
+
+        <td class="text-end"><b>{{ row.sale_price }}</b></td>
+
+        <td class="text-end">
+          <form method="post" action="{{ url_for('onway_item_cancel', item_id=row.id) }}" style="display:inline;">
+            <button class="btn btn-sm btn-outline-danger" type="submit">-1</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="btn btn-secondary" href="{{ url_for('onway') }}">Артқа</a>
+
+{% endblock %}

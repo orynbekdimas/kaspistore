@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Импорт нәтижесі</h3>
+
+{% if blocked %}
+  <p style="color:#b00;"><b>Тоқтатылды:</b> Кейбір карточка атаулары (alias) складта байланыспаған.</p>
+
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; max-width:900px;">
+    <thead>
+      <tr>
+        <th>Карточка атауы (alias)</th>
+        <th>Саны</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a, q in unknown %}
+      <tr>
+        <td>{{ a }}</td>
+        <td>{{ q }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:14px;">
+    <a class="btn btn-secondary" href="{{ url_for('import_page') }}">Артқа (қайта импорт)</a>
+    <a class="btn btn-primary" href="{{ url_for('products') }}">Складқа өту</a>
+  </div>
+
+{% else %}
+  <p style="color:green;"><b>ОК:</b> Сатылымдар қолданылды.</p>
+
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; max-width:900px;">
+    <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Сатылды (дана)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pid, qty in applied %}
+      <tr>
+        <td>{{ pid }}</td>
+        <td>{{ qty }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:14px;">
+    <a class="btn btn-primary" href="{{ url_for('products') }}">Складқа қайту</a>
+    <a class="btn btn-secondary" href="{{ url_for('import_page') }}">Тағы импорт</a>
+  </div>
+{% endif %}
+
+{% endblock %}

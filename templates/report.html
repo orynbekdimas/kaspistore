@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Отчет (күндік / айлық)</h2>
+
+<form method="get" action="{{ url_for('report') }}" style="max-width:1100px;">
+  <div style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+    <div>
+      <label>Басталу күні</label><br>
+      <input type="date" name="start" value="{{ start }}" style="padding:10px; width:220px;">
+    </div>
+    <div>
+      <label>Аяқталу күні</label><br>
+      <input type="date" name="end" value="{{ end }}" style="padding:10px; width:220px;">
+    </div>
+
+    <div>
+      <button class="btn btn-primary" type="submit">Көрсету</button>
+      <a class="btn btn-success"
+         href="{{ url_for('report_export', start=start, end=end) }}"
+         style="margin-left:8px;">Excel экспорт</a>
+    </div>
+  </div>
+</form>
+
+<hr>
+
+<div style="margin:10px 0;">
+  <b>Барлығы сатылды:</b> {{ totals.qty }} дана <br>
+  <b>Түсім:</b> {{ totals.revenue }} тг |
+  <b>Комиссия (12%):</b> {{ totals.commission }} тг |
+  <b>Доставка:</b> {{ totals.delivery }} тг |
+  <b>Закуп:</b> {{ totals.cogs }} тг |
+  <b>Таза пайда:</b> {{ totals.profit }} тг
+</div>
+
+<div style="display:flex; gap:30px; align-items:flex-start; flex-wrap:wrap;">
+
+  <div style="flex:1; min-width:520px;">
+    <h3>Тауар бойынша</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Тауар</th>
+          <th>Сатылды</th>
+          <th>Түсім</th>
+          <th>Комиссия</th>
+          <th>Доставка</th>
+          <th>Закуп</th>
+          <th>Таза пайда</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in prod_rows %}
+        <tr>
+          <td>{{ r.name }}</td>
+          <td>{{ r.qty }}</td>
+          <td>{{ r.revenue }}</td>
+          <td>{{ r.commission }}</td>
+          <td>{{ r.delivery }}</td>
+          <td>{{ r.cogs }}</td>
+          <td><b>{{ r.profit }}</b></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="flex:1; min-width:420px;">
+    <h3>Күн бойынша</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Күн</th>
+          <th>Сатылды</th>
+          <th>Түсім</th>
+          <th>Таза пайда</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in day_rows %}
+        <tr>
+          <td>{{ r.day }}</td>
+          <td>{{ r.qty }}</td>
+          <td>{{ r.revenue }}</td>
+          <td><b>{{ r.profit }}</b></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Жолдаға қосу</h3>
+<p class="text-muted">
+  Бұл жерде <b>Kaspi карточка атауын</b> (alias) таңдайсыз. Количество әрқашан 1. Сатылған бағаны енгізесіз.
+</p>
+
+<form method="post" style="max-width:900px;">
+  <div class="d-flex gap-3 flex-wrap align-items-end">
+
+    <div style="flex:1; min-width:320px;">
+      <label class="form-label">Карточка атауы (Kaspi)</label>
+      <select name="alias_id" class="form-select js-select2" required>
+        <option value=""></option>
+        {% for a in aliases %}
+          <option value="{{ a.id }}">{{ a.alias }}</option>
+        {% endfor %}
+      </select>
+      <small class="text-muted">Іздеу үшін карточка атын жаза беріңіз.</small>
+    </div>
+
+    <div style="flex:1; min-width:260px;">
+      <label class="form-label">Сатылған баға (тг)</label>
+      <input name="sale_price" class="form-control" placeholder="мысалы: 4999" required>
+    </div>
+
+    <div style="min-width:220px;">
+      <button class="btn btn-primary" type="submit">Қосу (+1)</button>
+      <a class="btn btn-secondary" href="{{ url_for('onway') }}">Артқа</a>
+    </div>
+
+  </div>
+</form>
+
+{% endblock %}

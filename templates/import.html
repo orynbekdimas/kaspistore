@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Excel импорт (сатылым)</h3>
+
+<form method="post" enctype="multipart/form-data" style="max-width:900px;">
+  <p style="margin: 10px 0;">
+    Ереже: Excel файлынан сатылғандарды оқимыз. <b>Сатылған күнді</b> өзіңіз таңдайсыз — сол күнге бекітіледі (Excel уақыт қате болса да).
+  </p>
+
+  <div style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+    <div style="flex:1; min-width:260px;">
+      <label style="display:block; margin-bottom:6px;">Файл</label>
+      <input type="file" name="file" required>
+    </div>
+
+    <div style="min-width:220px;">
+      <label style="display:block; margin-bottom:6px;">Сатылған күні</label>
+      <input type="date" name="sale_date" required>
+    </div>
+
+    <div style="min-width:160px;">
+      <button class="btn btn-primary" type="submit">Жүктеу</button>
+    </div>
+  </div>
+
+  <div style="margin-top:10px; color:#666;">
+    <small>
+      Егер файл Kaspi <b>ArchiveOrders</b> болса — “Выдан/Доставлен” статустарын алып, “Сумма” және “Стоимость доставки для продавца” арқылы пайда есебі жұмыс істейді.
+      Ал ескі “күндік файл” болса — тек сату саны түседі (пайда бөлігі 0 болады).
+    </small>
+  </div>
+</form>
+{% endblock %}

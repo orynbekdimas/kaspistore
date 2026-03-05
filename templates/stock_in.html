@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Келіп түсті (IN)</h3>
+<p class="text-muted">
+  Енді бұл бет тек <b>“Келе жатыр”</b> тізімінен жұмыс істейді: сол жерден азаяды, складқа қосылады.
+</p>
+
+<form method="post" style="max-width:1100px;">
+  <div style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+    <div style="flex:1; min-width:320px;">
+      <label style="display:block; margin-bottom:6px;">Тауар таңдаңыз...</label>
+      <select name="product_id" class="form-select" required>
+        <option value="">Тауар таңдаңыз...</option>
+        {% for p in products %}
+          <option value="{{ p.id }}">
+            {{ p.name }} (incoming: {{ incoming_map.get(p.id, 0) }})
+          </option>
+        {% endfor %}
+      </select>
+      {% if products|length == 0 %}
+        <small class="text-muted">Қазір “Келе жатыр” тізімінде тауар жоқ.</small>
+      {% endif %}
+    </div>
+
+    <div style="min-width:160px;">
+      <label style="display:block; margin-bottom:6px;">Саны</label>
+      <input name="qty" type="number" min="1" class="form-control" required>
+      <small class="text-muted">Qty incoming санынан көп болмауы керек.</small>
+    </div>
+
+    <div style="flex:1; min-width:280px;">
+      <label style="display:block; margin-bottom:6px;">Ескерту</label>
+      <input name="note" class="form-control" placeholder="поставщик/чек/ескерту...">
+    </div>
+
+    <div style="min-width:160px;">
+      <button class="btn btn-primary" type="submit">Қосу</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

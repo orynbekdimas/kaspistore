@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Flask
+instance/
+*.log
+
+# SQLite DB (қаласаң базаны репоға қоспау үшін)
+*.db
+
+# OS
+.DS_Store
+Thumbs.db

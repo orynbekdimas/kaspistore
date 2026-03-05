@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Жолда (Excel импорт)</h3>
+<p class="text-muted">
+ActiveOrders.xlsx файлын жүктеңіз. Біз тек <b>“Передан курьеру”</b> статусын аламыз.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="row g-2">
+  <div class="col-md-6">
+    <input type="file" name="file" class="form-control" required>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100">Импорт</button>
+  </div>
+</form>
+{% endblock %}

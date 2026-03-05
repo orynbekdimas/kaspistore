@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Тауарды өзгерту</h3>
+
+<form method="post" class="row g-3 mt-1">
+  <div class="col-md-8">
+    <label class="form-label">Тауар атауы</label>
+    <input class="form-control" name="name" value="{{ product.name }}" required>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Сатып алу бағасы</label>
+    <input class="form-control" name="purchase_price" type="number" min="1" value="{{ product.purchase_price }}" required>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Қалдық</label>
+    <input class="form-control" name="stock_qty" type="number" min="0" value="{{ product.stock_qty }}" required>
+  </div>
+
+  <div class="col-12 d-flex gap-2">
+    <button class="btn btn-primary">Сақтау</button>
+    <a class="btn btn-secondary" href="{{ url_for('products') }}">Артқа</a>
+  </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4>{{ product.name }}</h4>
+
+<p>
+  Қоймада: <b>{{ product.stock_qty }}</b> |
+  Жолда: <b>{{ product.in_transit_qty or 0 }}</b> |
+  Барлығы: <b>{{ (product.stock_qty or 0) + (product.in_transit_qty or 0) }}</b>
+</p>
+
+<hr>
+
+<h5>Карточка атаулары (alias)</h5>
+<form class="row g-2 mb-2" method="post">
+  <div class="col-md-6">
+    <input class="form-control" name="alias" placeholder="Мысалы: аяқ киім / аяк киім">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-secondary w-100">Қосу</button>
+  </div>
+</form>
+
+<ul>
+  {% for a in aliases %}
+    <li>{{ a.alias }}</li>
+  {% endfor %}
+</ul>
+
+<hr>
+
+<h5>Соңғы қозғалыстар</h5>
+
+<form class="row g-2 mb-2" method="get">
+  <div class="col-md-3">
+    <label class="form-label">Басталу күні</label>
+    <input type="date" class="form-control" name="start" value="{{ start or '' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Аяқталу күні</label>
+    <input type="date" class="form-control" name="end" value="{{ end or '' }}">
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <button class="btn btn-primary w-100">Көрсету</button>
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <a class="btn btn-outline-secondary w-100" href="{{ url_for('product_detail', product_id=product.id) }}">Тазалау</a>
+  </div>
+</form>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Уақыты</th>
+      <th>Түрі</th>
+      <th>Өзгеріс</th>
+      <th>Сатылды (түсім)</th>
+      <th>Комиссия</th>
+      <th>Доставка</th>
+      <th>Закуп</th>
+      <th>Пайда</th>
+      <th>Ескерту</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in movements %}
+      {% if m.kind == 'SALE' %}
+        {% set qty = (-m.qty_change) %}
+        {% set revenue = (m.sale_sum or 0) %}
+        {% set delivery = (m.delivery_cost or 0) %}
+        {% set pct = (m.commission_pct or 12) %}
+        {% set commission = (revenue * pct // 100) %}
+        {% set cogs = (qty * (product.purchase_price or 0)) %}
+        {% set profit = revenue - commission - delivery - cogs %}
+
+        <tr>
+          <td>{{ m.created_at }}</td>
+          <td>{{ m.kind }}</td>
+          <td>{{ m.qty_change }}</td>
+          <td>{{ revenue }}</td>
+          <td>{{ commission }} ({{ pct }}%)</td>
+          <td>{{ delivery }}</td>
+          <td>{{ cogs }}</td>
+          <td><b>{{ profit }}</b></td>
+          <td>{{ m.note or '' }}</td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
