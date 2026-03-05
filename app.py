@@ -1,6 +1,7 @@
 # app.py
 from datetime import datetime, date, time
 from io import BytesIO
+from services.chatbot_tools import top_profit_product_last_week, summary_numbers
 
 import openpyxl
 from flask import (
@@ -1360,25 +1361,40 @@ def chat_page():
     """Chat UI page."""
     return render_template("chat.html")
 
-
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
-    """JSON API for chat messages.
-
-    Request:
-      {"message": "..."}
-    Response:
-      {"reply": "..."}
-    """
     data = request.get_json(silent=True) or {}
     msg = (data.get("message") or "").strip()
     if not msg:
         return jsonify({"error": "Empty message"}), 400
 
-    if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
+    msg_lower = msg.lower()
+
+    # ✅ 1) Нақты DB сұрақтарын ұстаймыз (AI-сыз, нақты жауап)
+    if ("алдыңғы апта" in msg_lower or "өткен апта" in msg_lower) and ("ең көп" in msg_lower) and ("пайда" in msg_lower):
+        best = top_profit_product_last_week()
+        if not best:
+            return jsonify({"reply": "Өткен апта бойынша сатылым деректері табылмады (SALE жоқ)."}), 200
+
         return jsonify({
-            "error": "Server is not configured: set GEMINI_API_KEY env var"
-        }), 500
+            "reply": f"Өткен апта ({best.start} — {best.end}) ең көп пайда әкелген карточка: **{best.name}**.\nТаза пайда: **{best.profit} тг**."
+        }), 200
+
+    if ("қорытынды" in msg_lower or "summary" in msg_lower or "айналым" in msg_lower or "склад" in msg_lower):
+        s = summary_numbers()
+        return jsonify({
+            "reply": (
+                f"Қысқаша қорытынды:\n"
+                f"- Склад сомасы: **{s['stockTotal']} тг**\n"
+                f"- Келе жатыр: **{s['incomingTotal']} тг**\n"
+                f"- Жолда: **{s['onwayTotal']} тг**\n"
+                f"- Жалпы айналым: **{s['turnoverTotal']} тг**"
+            )
+        }), 200
+
+    # ✅ 2) Басқа сұрақтар — Gemini-ге (жалпы көмек/инструкция)
+    if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
+        return jsonify({"error": "Server is not configured: set GEMINI_API_KEY env var"}), 500
 
     try:
         client = _get_gemini_client()
@@ -1387,15 +1403,13 @@ def api_chat():
             contents=msg,
             config=types.GenerateContentConfig(
                 system_instruction=CHATBOT_INSTRUCTIONS,
-                max_output_tokens=1200,  # 🔥 ұлғайттық (800–2000 қоя аласың)
+                max_output_tokens=1200,
                 temperature=0.6,
             ),
         )
 
-        # 1) resp.text
+        # толығырақ жинау (үзіліп қалмау үшін)
         text = (getattr(resp, "text", None) or "").strip()
-
-        # 2) толық жинау: candidates -> content.parts
         parts = []
         if getattr(resp, "candidates", None):
             for cand in resp.candidates:
@@ -1405,22 +1419,13 @@ def api_chat():
                         t = getattr(p, "text", None)
                         if t:
                             parts.append(t)
-
         joined = "".join(parts).strip()
         if len(joined) > len(text):
             text = joined
 
-        # Диагностика: неге тоқтады?
-        finish_reason = ""
-        if getattr(resp, "candidates", None):
-            finish_reason = str(getattr(resp.candidates[0], "finish_reason", ""))  # STOP / MAX_TOKENS / SAFETY ...
-            print("Gemini finish_reason:", finish_reason)
-
-        reply = text or "(empty reply)"
-        return jsonify({"reply": reply, "finish_reason": finish_reason})
+        return jsonify({"reply": text or "(empty reply)"})
     except Exception as e:
         return jsonify({"error": f"AI request failed: {e}"}), 500
-
 
 if __name__ == "__main__":
     # ✅ Эмулятор/телефон кіре алуы үшін:

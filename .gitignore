@@ -10,6 +10,7 @@ instance/
 *.log
 
 # SQLite DB (қаласаң базаны репоға қоспау үшін)
+app.db
 *.db
 
 # OS
